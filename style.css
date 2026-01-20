@@ -3,6 +3,15 @@
   padding: 0;
   box-sizing: border-box;
 }
+body { font-family: Arial, sans-serif; padding: 20px; }
+button { margin: 5px; padding: 5px 10px; cursor: pointer; }
+button:hover { background-color: #eee; }
+.recipe-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+}
 
 body {
   font-family: Arial, sans-serif;
