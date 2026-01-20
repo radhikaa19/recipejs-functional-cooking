@@ -1,98 +1,67 @@
-// Recipe data
+// 1️⃣ Original recipes array (immutable)
 const recipes = [
-  {
-    id: 1,
-    title: "Creamy Pasta",
-    time: 25,
-    difficulty: "easy",
-    description: "A quick and creamy pasta perfect for busy days.",
-    category: "pasta"
-  },
-  {
-    id: 2,
-    title: "Vegetable Stir Fry",
-    time: 20,
-    difficulty: "easy",
-    description: "Healthy and colorful veggies tossed in a light sauce.",
-    category: "vegetarian"
-  },
-  {
-    id: 3,
-    title: "Chicken Curry",
-    time: 60,
-    difficulty: "medium",
-    description: "A flavorful Indian-style chicken curry.",
-    category: "curry"
-  },
-  {
-    id: 4,
-    title: "Beef Stew",
-    time: 90,
-    difficulty: "hard",
-    description: "Slow-cooked beef stew with rich flavors.",
-    category: "stew"
-  },
-  {
-    id: 5,
-    title: "Caesar Salad",
-    time: 15,
-    difficulty: "easy",
-    description: "Fresh salad with classic Caesar dressing.",
-    category: "salad"
-  },
-  {
-    id: 6,
-    title: "Paneer Butter Masala",
-    time: 45,
-    difficulty: "medium",
-    description: "Creamy tomato-based curry with paneer cubes.",
-    category: "curry"
-  },
-  {
-    id: 7,
-    title: "Lasagna",
-    time: 80,
-    difficulty: "hard",
-    description: "Layered pasta baked with cheese and sauce.",
-    category: "pasta"
-  },
-  {
-    id: 8,
-    title: "Grilled Fish",
-    time: 35,
-    difficulty: "medium",
-    description: "Perfectly grilled fish with herbs and spices.",
-    category: "seafood"
-  }
+  { name: "Pancakes", difficulty: "Easy", time: 20 },
+  { name: "Lasagna", difficulty: "Medium", time: 60 },
+  { name: "Chocolate Cake", difficulty: "Hard", time: 90 },
+  { name: "Salad", difficulty: "Easy", time: 15 },
+  { name: "Sandwich", difficulty: "Easy", time: 10 },
 ];
 
-// DOM selection
-const recipeContainer = document.querySelector("#recipe-container");
+// 2️⃣ Current state for filter & sort
+let currentFilter = "all";
+let currentSort = null;
 
-// Create recipe card
-const createRecipeCard = (recipe) => {
-  return `
-    <div class="recipe-card" data-id="${recipe.id}">
-      <h3>${recipe.title}</h3>
-      <div class="recipe-meta">
-        <span>⏱️ ${recipe.time} min</span>
-        <span class="difficulty ${recipe.difficulty}">
-          ${recipe.difficulty}
-        </span>
-      </div>
-      <p>${recipe.description}</p>
-    </div>
-  `;
+// 3️⃣ Pure filter functions
+const filterFunctions = {
+  all: (recipe) => true,
+  easy: (recipe) => recipe.difficulty.toLowerCase() === "easy",
+  medium: (recipe) => recipe.difficulty.toLowerCase() === "medium",
+  hard: (recipe) => recipe.difficulty.toLowerCase() === "hard",
+  quick: (recipe) => recipe.time < 30,
 };
 
-// Render recipes
-const renderRecipes = (recipesArray) => {
-  const cardsHTML = recipesArray
-    .map(recipe => createRecipeCard(recipe))
+// 4️⃣ Pure sort functions
+const sortFunctions = {
+  name: (a, b) => a.name.localeCompare(b.name),
+  time: (a, b) => a.time - b.time,
+};
+
+// 5️⃣ Central updateDisplay() function
+function updateDisplay() {
+  // Filter recipes using higher-order function
+  const filtered = recipes.filter(filterFunctions[currentFilter]);
+
+  // Sort recipes if sort option selected (use a new array to avoid mutation)
+  const sorted = currentSort ? [...filtered].sort(sortFunctions[currentSort]) : filtered;
+
+  // Render recipes in HTML
+  const container = document.getElementById("recipe-list");
+  container.innerHTML = sorted
+    .map(
+      (r) => `<div class="recipe-card">
+                 <h3>${r.name}</h3>
+                 <p>Difficulty: ${r.difficulty}</p>
+                 <p>Time: ${r.time} min</p>
+               </div>`
+    )
     .join("");
+}
 
-  recipeContainer.innerHTML = cardsHTML;
-};
+// 6️⃣ Event listeners for filter buttons
+document.querySelectorAll("#filters button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    currentFilter = btn.dataset.filter;
+    updateDisplay();
+  });
+});
 
-// Initialize app
-renderRecipes(recipes);
+// 7️⃣ Event listeners for sort buttons
+document.querySelectorAll("#sort button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    currentSort = btn.dataset.sort;
+    updateDisplay();
+  });
+});
+
+// 8️⃣ Initial render
+updateDisplay();
